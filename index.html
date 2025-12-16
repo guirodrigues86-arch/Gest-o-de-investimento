@@ -1,5 +1,3 @@
-
-index_final.html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -744,7 +742,55 @@ index_final.html
                 <button class="btn btn-primary" onclick="salvarFaturamento()">💾 Salvar Faturamento</button>
             </div>
 
+                        <div class="card">
+                <div class="card-title">💰 Faturamento Mensal por Canal</div>
+                
+                <div class="grid">
+                    <div class="form-group">
+                        <label class="form-label">Mês *</label>
+                        <input type="month" id="mesFaturamento" class="form-input" value="2025-12">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Canal *</label>
+                        <select id="canalFaturamento" class="form-select">
+                            <option value="">-- Selecione --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Faturamento (R$) *</label>
+                    <input type="number" id="valorFaturamento" class="form-input" placeholder="0,00" step="0.01">
+                </div>
+
+                <button class="btn btn-primary" onclick="salvarFaturamento()">💾 Salvar Faturamento</button>
+            </div>
+
             <div class="card">
+                <div class="card-title">💰 Faturamento Mensal por Canal</div>
+                
+                <div class="grid">
+                    <div class="form-group">
+                        <label class="form-label">Mês *</label>
+                        <input type="month" id="mesFaturamento" class="form-input" value="2025-12">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Canal *</label>
+                        <select id="canalFaturamento" class="form-select">
+                            <option value="">-- Selecione --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Faturamento (R$) *</label>
+                    <input type="number" id="valorFaturamento" class="form-input" placeholder="0,00" step="0.01">
+                </div>
+
+                <button class="btn btn-primary" onclick="salvarFaturamento()">💾 Salvar Faturamento</button>
+            </div>
+
+<div class="card">
                 <div class="card-title">📊 Orçamento Manual</div>
                 
                 <div class="grid">
@@ -793,6 +839,33 @@ index_final.html
                     </table>
                 </div>
             </div>
+
+            <!-- Importar Faturamento -->
+            <div class="card">
+                <div class="card-title">📊 Importar Faturamento Mensal</div>
+                <p class="text-muted mb-16">Importe o faturamento para cálculo automático de orçamento</p>
+
+                <div class="form-group">
+                    <label class="form-label">Arquivo CSV/Excel *</label>
+                    <input type="file" id="arquivoFaturamento" class="form-input" accept=".csv,.xlsx">
+                </div>
+
+                <div id="faturamento-preview" class="hidden">
+                    <div class="alert alert-info">Preview dos dados (máx. 5 primeiras linhas)</div>
+                    <div class="table-container mt-16">
+                        <table>
+                            <thead id="faturamento-header"></thead>
+                            <tbody id="faturamento-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="btn-group mt-16">
+                    <button class="btn btn-primary" onclick="importarFaturamentoExcel()">📥 Importar Faturamento (Excel)</button>
+                </div>
+            </div>
+
+
         </div>
 
         <!-- RELATÓRIOS TAB -->
@@ -1375,6 +1448,246 @@ index_final.html
             alert('Faturamento salvo com sucesso!');
             document.getElementById('valorFaturamento').value = '';
             atualizarDashboard();
+        }
+
+        
+        function salvarFaturamento() {
+            const mes = document.getElementById('mesFaturamento').value;
+            const canal = document.getElementById('canalFaturamento').value;
+            const valor = parseFloat(document.getElementById('valorFaturamento').value);
+
+            if (!mes || !canal || !valor) {
+                alert('Por favor, preencha todos os campos');
+                return;
+            }
+
+            const chave = `${mes}-${canal}`;
+            faturamentoMensal[chave] = valor;
+            salvarDados();
+
+            alert('Faturamento salvo com sucesso!');
+            document.getElementById('valorFaturamento').value = '';
+            atualizarDashboard();
+        }
+
+        
+        function salvarFaturamento() {
+            const mes = document.getElementById('mesFaturamento').value;
+            const canal = document.getElementById('canalFaturamento').value;
+            const valor = parseFloat(document.getElementById('valorFaturamento').value);
+
+            if (!mes || !canal || !valor) {
+                alert('Por favor, preencha todos os campos');
+                return;
+            }
+
+            const chave = `${mes}-${canal}`;
+            faturamentoMensal[chave] = valor;
+            salvarDados();
+
+            alert('Faturamento salvo com sucesso!');
+            document.getElementById('valorFaturamento').value = '';
+            atualizarDashboard();
+        }
+
+        
+        function importarFaturamentoExcel() {
+            const arquivo = document.getElementById('arquivoFaturamento').files[0];
+            if (!arquivo) {
+                alert('❌ Selecione um arquivo!');
+                return;
+            }
+
+            // Carregar biblioteca XLSX via CDN
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js';
+            
+            script.onload = function() {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    try {
+                        const dados = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(dados, { type: 'array', cellFormula: true });
+                        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                        
+                        // Índices das colunas (com base zero)
+                        // O = coluna 14, AH = coluna 33, AR = coluna 43, AS = coluna 44
+                        let faturamentoAgrupado = {};
+                        let linhasProcessadas = 0;
+                        let erros = 0;
+                        
+                        // Pegar intervalo de células
+                        const range = XLSX.utils.decode_range(worksheet['!ref']);
+                        
+                        // Processar cada linha
+                        for (let row = range.s.r + 1; row <= range.e.r; row++) {
+                            try {
+                                // Extrair valores das colunas específicas
+                                const cellO = worksheet[XLSX.utils.encode_col(14) + (row + 1)];   // Coluna O
+                                const cellAH = worksheet[XLSX.utils.encode_col(33) + (row + 1)];  // Coluna AH
+                                const cellAR = worksheet[XLSX.utils.encode_col(43) + (row + 1)];  // Coluna AR
+                                const cellAS = worksheet[XLSX.utils.encode_col(44) + (row + 1)];  // Coluna AS
+                                
+                                if (!cellO || !cellAH || !cellAR || !cellAS) continue;
+                                
+                                const valor = parseFloat(cellO.v) || 0;
+                                const canal = String(cellAH.v || '').trim().toUpperCase();
+                                const mes = String(cellAR.v || '').toString().padStart(2, '0');
+                                const ano = String(cellAS.v || '');
+                                
+                                if (!valor || valor <= 0 || !canal || !mes || !ano) continue;
+                                
+                                // Formatar para YYYY-MM (ex: 2025-01)
+                                const anoMes = `${ano}-${mes}`;
+                                const chave = `${anoMes}-${canal}`;
+                                
+                                // Agrupar valores por canal e mês
+                                faturamentoAgrupado[chave] = (faturamentoAgrupado[chave] || 0) + valor;
+                                linhasProcessadas++;
+                                
+                            } catch (err) {
+                                erros++;
+                                continue;
+                            }
+                        }
+                        
+                        // Salvar no localStorage
+                        Object.keys(faturamentoAgrupado).forEach(chave => {
+                            const partes = chave.split('-');
+                            const anoMes = partes[0] + '-' + partes[1];
+                            const canal = partes.slice(2).join('-');
+                            faturamentoMensal[anoMes + '-' + canal] = faturamentoAgrupado[chave];
+                        });
+                        
+                        salvarDados();
+                        
+                        const totalCanais = new Set(Object.keys(faturamentoAgrupado).map(k => {
+                            const partes = k.split('-');
+                            return partes.slice(2).join('-');
+                        })).size;
+                        const totalMeses = new Set(Object.keys(faturamentoAgrupado).map(k => {
+                            const partes = k.split('-');
+                            return partes[0] + '-' + partes[1];
+                        })).size;
+                        
+                        alert(`✅ IMPORTAÇÃO CONCLUÍDA!\n\n📊 Linhas processadas: ${linhasProcessadas}\n🗂️ Canais únicos: ${totalCanais}\n📅 Períodos (meses): ${totalMeses}\n💾 Registros salvos: ${Object.keys(faturamentoAgrupado).length}\n❌ Erros encontrados: ${erros}`);
+                        
+                        atualizarDashboard();
+                        
+                    } catch (err) {
+                        alert('❌ Erro ao processar Excel: ' + err.message + '\n\nVerifique se o arquivo tem as colunas:\n- O: Faturamento\n- AH: Canal\n- AR: Mês\n- AS: Ano');
+                    }
+                };
+                
+                reader.readAsArrayBuffer(arquivo);
+            };
+            
+            script.onerror = function() {
+                alert('❌ Erro ao carregar biblioteca XLSX. Verifique sua conexão com a internet.');
+            };
+            
+            document.head.appendChild(script);
+        }
+
+        
+        function importarFaturamentoExcel() {
+            const arquivo = document.getElementById('arquivoFaturamento').files[0];
+            if (!arquivo) {
+                alert('❌ Selecione um arquivo!');
+                return;
+            }
+
+            // Carregar biblioteca XLSX via CDN
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js';
+            
+            script.onload = function() {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    try {
+                        const dados = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(dados, { type: 'array', cellFormula: true });
+                        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                        
+                        // Índices das colunas (com base zero)
+                        // O = coluna 14, AH = coluna 33, AR = coluna 43, AS = coluna 44
+                        let faturamentoAgrupado = {};
+                        let linhasProcessadas = 0;
+                        let erros = 0;
+                        
+                        // Pegar intervalo de células
+                        const range = XLSX.utils.decode_range(worksheet['!ref']);
+                        
+                        // Processar cada linha
+                        for (let row = range.s.r + 1; row <= range.e.r; row++) {
+                            try {
+                                // Extrair valores das colunas específicas
+                                const cellO = worksheet[XLSX.utils.encode_col(14) + (row + 1)];   // Coluna O
+                                const cellAH = worksheet[XLSX.utils.encode_col(33) + (row + 1)];  // Coluna AH
+                                const cellAR = worksheet[XLSX.utils.encode_col(43) + (row + 1)];  // Coluna AR
+                                const cellAS = worksheet[XLSX.utils.encode_col(44) + (row + 1)];  // Coluna AS
+                                
+                                if (!cellO || !cellAH || !cellAR || !cellAS) continue;
+                                
+                                const valor = parseFloat(cellO.v) || 0;
+                                const canal = String(cellAH.v || '').trim().toUpperCase();
+                                const mes = String(cellAR.v || '').toString().padStart(2, '0');
+                                const ano = String(cellAS.v || '');
+                                
+                                if (!valor || valor <= 0 || !canal || !mes || !ano) continue;
+                                
+                                // Formatar para YYYY-MM (ex: 2025-01)
+                                const anoMes = `${ano}-${mes}`;
+                                const chave = `${anoMes}-${canal}`;
+                                
+                                // Agrupar valores por canal e mês
+                                faturamentoAgrupado[chave] = (faturamentoAgrupado[chave] || 0) + valor;
+                                linhasProcessadas++;
+                                
+                            } catch (err) {
+                                erros++;
+                                continue;
+                            }
+                        }
+                        
+                        // Salvar no localStorage
+                        Object.keys(faturamentoAgrupado).forEach(chave => {
+                            const partes = chave.split('-');
+                            const anoMes = partes[0] + '-' + partes[1];
+                            const canal = partes.slice(2).join('-');
+                            faturamentoMensal[anoMes + '-' + canal] = faturamentoAgrupado[chave];
+                        });
+                        
+                        salvarDados();
+                        
+                        const totalCanais = new Set(Object.keys(faturamentoAgrupado).map(k => {
+                            const partes = k.split('-');
+                            return partes.slice(2).join('-');
+                        })).size;
+                        const totalMeses = new Set(Object.keys(faturamentoAgrupado).map(k => {
+                            const partes = k.split('-');
+                            return partes[0] + '-' + partes[1];
+                        })).size;
+                        
+                        alert(`✅ IMPORTAÇÃO CONCLUÍDA!\n\n📊 Linhas processadas: ${linhasProcessadas}\n🗂️ Canais únicos: ${totalCanais}\n📅 Períodos (meses): ${totalMeses}\n💾 Registros salvos: ${Object.keys(faturamentoAgrupado).length}\n❌ Erros encontrados: ${erros}`);
+                        
+                        atualizarDashboard();
+                        
+                    } catch (err) {
+                        alert('❌ Erro ao processar Excel: ' + err.message + '\n\nVerifique se o arquivo tem as colunas:\n- O: Faturamento\n- AH: Canal\n- AR: Mês\n- AS: Ano');
+                    }
+                };
+                
+                reader.readAsArrayBuffer(arquivo);
+            };
+            
+            script.onerror = function() {
+                alert('❌ Erro ao carregar biblioteca XLSX. Verifique sua conexão com a internet.');
+            };
+            
+            document.head.appendChild(script);
         }
 
         function salvarOrcamentoManual() {
