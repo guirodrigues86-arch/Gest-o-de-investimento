@@ -42,7 +42,6 @@
             padding: var(--space-24);
         }
 
-        /* Header */
         .header {
             background: linear-gradient(135deg, #218D8D 0%, #1a6f6f 100%);
             color: white;
@@ -62,7 +61,6 @@
             font-size: 14px;
         }
 
-        /* Tabs */
         .tabs {
             display: flex;
             gap: var(--space-8);
@@ -93,7 +91,6 @@
             border-bottom-color: var(--color-primary);
         }
 
-        /* Tab Content */
         .tab-content {
             display: none;
         }
@@ -102,7 +99,6 @@
             display: block;
         }
 
-        /* Cards */
         .card {
             background: var(--color-surface);
             border-radius: 8px;
@@ -119,7 +115,6 @@
             color: var(--color-text);
         }
 
-        /* Grid */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -131,7 +126,6 @@
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
         }
 
-        /* Form */
         .form-group {
             margin-bottom: var(--space-16);
         }
@@ -160,7 +154,6 @@
             box-shadow: 0 0 0 3px rgba(33, 141, 141, 0.1);
         }
 
-        /* Buttons */
         .btn {
             padding: 10px var(--space-16);
             border: none;
@@ -222,7 +215,6 @@
             flex-wrap: wrap;
         }
 
-        /* Table */
         .table-container {
             overflow-x: auto;
             border-radius: 8px;
@@ -276,12 +268,6 @@
             color: #15803d;
         }
 
-        .status-aberto {
-            background-color: rgba(245, 158, 11, 0.1);
-            color: #92400e;
-        }
-
-        /* Stats Box */
         .stat-box {
             background: var(--color-surface);
             border: 1px solid var(--color-border);
@@ -310,7 +296,6 @@
             margin-top: var(--space-8);
         }
 
-        /* Alert */
         .alert {
             padding: var(--space-16);
             border-radius: 6px;
@@ -342,59 +327,6 @@
             border-left: 4px solid var(--color-info);
         }
 
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-        }
-
-        .modal.active {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background-color: var(--color-surface);
-            border-radius: 8px;
-            padding: var(--space-24);
-            max-width: 600px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: var(--space-16);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: var(--color-text-secondary);
-        }
-
-        /* Chart */
-        .chart-container {
-            position: relative;
-            height: 300px;
-            margin-bottom: var(--space-24);
-        }
-
-        /* Responsive */
         @media (max-width: 768px) {
             .container {
                 padding: var(--space-16);
@@ -478,7 +410,6 @@
             <p>Gestão de Verbas - Coop Off, Rebate e Bonus</p>
         </div>
 
-        <!-- Tabs -->
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('dashboard', event)">📊 Dashboard</button>
             <button class="tab-btn" onclick="switchTab('lancamentos', event)">➕ Lançamentos</button>
@@ -486,7 +417,6 @@
             <button class="tab-btn" onclick="switchTab('relatorios', event)">📋 Relatórios</button>
         </div>
 
-        <!-- DASHBOARD TAB -->
         <div id="dashboard" class="tab-content active">
             <div class="card">
                 <div class="card-title">📈 Resumo Mensal - Dezembro 2025</div>
@@ -498,4 +428,23 @@
 
                 <div class="grid grid-lg">
                     <div class="stat-box">
-                        <div class
+                        <div class="stat-label">Total Investido</div>
+                        <div class="stat-value" id="totalInvestido">R$ 0,00</div>
+                        <div class="stat-unit">neste mês</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Orçamento Disponível</div>
+                        <div class="stat-value" id="orcamentoDisp">R$ 0,00</div>
+                        <div class="stat-unit">por gastar</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Taxa de Utilização</div>
+                        <div class="stat-value" id="taxaUtil">0%</div>
+                        <div class="stat-unit">do budget</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Clientes Acima do Budget</div>
+                        <div class="stat-value" id="clientesAviso">0</div>
+                        <div class="stat-unit">requerem atenção</div>
+                    </div>
+                </div
