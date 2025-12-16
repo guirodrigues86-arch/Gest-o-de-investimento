@@ -376,10 +376,8 @@
             color: var(--color-text-secondary);
         }
 
-        .chart-container {
-            position: relative;
-            height: 300px;
-            margin-bottom: var(--space-24);
+        .modal-close:hover {
+            color: var(--color-text);
         }
 
         @media (max-width: 768px) {
@@ -387,16 +385,20 @@
                 padding: var(--space-16);
             }
 
-            .grid {
-                grid-template-columns: 1fr;
+            .header {
+                padding: var(--space-24) var(--space-16);
             }
 
             .header h1 {
                 font-size: 20px;
             }
 
-            table {
-                font-size: 12px;
+            .grid, .grid-lg {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
             }
 
             th, td {
@@ -598,41 +600,35 @@
 
                 <div class="grid">
                     <div class="form-group">
-                        <label class="form-label">Canal *</label>
-                        <input type="text" id="canalLancamento" class="form-input" readonly>
+                        <label class="form-label">Tipo de Investimento *</label>
+                        <select id="tipoLancamento" class="form-select">
+                            <option value="">-- Selecione --</option>
+                            <option value="COOP OFF">COOP OFF</option>
+                            <option value="REBATE">REBATE</option>
+                            <option value="BONUS">BONUS</option>
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Tipo de Verba *</label>
-                        <select id="tipoVerba" class="form-select">
+                        <label class="form-label">Canal *</label>
+                        <select id="canalLancamento" class="form-select">
                             <option value="">-- Selecione --</option>
-                            <option value="COOP OFF">Coop Off</option>
-                            <option value="REBATE">Rebate</option>
-                            <option value="BONUS">Bonus por Meta</option>
-                            <option value="VPC">VPC</option>
-                            <option value="INVESTIMENTOS">Investimentos</option>
                         </select>
                     </div>
                 </div>
 
-                <div class="grid">
-                    <div class="form-group">
-                        <label class="form-label">Descrição *</label>
-                        <input type="text" id="descricaoLancamento" class="form-input" placeholder="Ex: Promoção de Verão">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Valor (R$) *</label>
-                        <input type="number" id="valorLancamento" class="form-input" placeholder="0,00" step="0.01">
-                    </div>
+                <div class="form-group">
+                    <label class="form-label">Descrição *</label>
+                    <input type="text" id="descricaoLancamento" class="form-input" placeholder="Ex: INVESTIMENTO - BONUS">
                 </div>
 
                 <div class="grid">
                     <div class="form-group">
-                        <label class="form-label">Mês de Referência *</label>
-                        <input type="month" id="mesLancamento" class="form-input" value="2025-12">
+                        <label class="form-label">Valor (R$) *</label>
+                        <input type="number" id="valorLancamento" class="form-input" placeholder="0,00" step="0.01">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Mês de Competência (Despesa) *</label>
-                        <input type="month" id="mesTrabalho" class="form-input" value="2025-12">
+                        <label class="form-label">Mês *</label>
+                        <input type="month" id="mesLancamento" class="form-input" value="2025-12">
                     </div>
                 </div>
 
@@ -640,60 +636,36 @@
                     <div class="form-group">
                         <label class="form-label">Status *</label>
                         <select id="statusLancamento" class="form-select">
-                            <option value="Provisão">📌 Provisão (expectativa de gasto)</option>
-                            <option value="ND Negociada">✅ ND Negociada (oficializada)</option>
-                            <option value="Pago">💳 Pago</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Data Prevista de Pagamento *</label>
-                        <input type="date" id="dataPrevisaoPagamento" class="form-input" value="">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Observações</label>
-                    <textarea id="obsLancamento" class="form-textarea" rows="3" placeholder="Detalhes adicionais..."></textarea>
-                </div>
-
-                <div class="btn-group">
-                    <button class="btn btn-primary" onclick="adicionarLancamento()">✅ Lançar Investimento</button>
-                    <button class="btn btn-secondary" onclick="limparFormulario()">🔄 Limpar</button>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-title">📝 Histórico de Lançamentos</div>
-                
-                <div class="grid">
-                    <div class="form-group">
-                        <label class="form-label">Filtrar por Cliente:</label>
-                        <input type="text" id="filtroCliente" class="form-input" placeholder="Procure um cliente..." onkeyup="filtrarLancamentos()">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Filtrar por Status:</label>
-                        <select id="filtroStatus" class="form-select" onchange="filtrarLancamentos()">
-                            <option value="">-- Todos --</option>
                             <option value="Provisão">Provisão</option>
                             <option value="ND Negociada">ND Negociada</option>
                             <option value="Pago">Pago</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label class="form-label">Data Previsão Pagamento</label>
+                        <input type="date" id="dataPagamentoLancamento" class="form-input">
+                    </div>
                 </div>
 
-                <div class="table-container mt-16">
+                <div class="form-group">
+                    <label class="form-label">Observações</label>
+                    <textarea id="obsLancamento" class="form-textarea" rows="3" placeholder="Notas adicionais..."></textarea>
+                </div>
+
+                <button class="btn btn-primary" onclick="salvarLancamento()">💾 Salvar Lançamento</button>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📋 Lançamentos Registrados</div>
+                <div class="table-container">
                     <table>
                         <thead>
                             <tr>
                                 <th>ID</th>
                                 <th>Cliente</th>
-                                <th>Canal</th>
-                                <th>Verba</th>
-                                <th>Descrição</th>
+                                <th>Tipo</th>
                                 <th>Valor</th>
-                                <th>Mês Ref.</th>
-                                <th>Mês Competência</th>
-                                <th>Prev. Pagto</th>
+                                <th>Mês</th>
                                 <th>Status</th>
                                 <th>Ações</th>
                             </tr>
@@ -707,94 +679,49 @@
         <!-- CONFIGURAÇÕES TAB -->
         <div id="configuracoes" class="tab-content">
             <div class="card">
-                <div class="card-title">📋 Cadastro de Clientes</div>
-                
-                <div class="form-group">
-                    <label class="form-label">Nome do Cliente *</label>
-                    <input type="text" id="nomeCliente" class="form-input">
-                </div>
-
-                <div class="grid">
-                    <div class="form-group">
-                        <label class="form-label">Código *</label>
-                        <input type="text" id="codigoCliente" class="form-input" placeholder="EX: CLI001">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Canal *</label>
-                        <select id="canalCliente" class="form-select">
-                            <option value="">-- Selecione --</option>
-                            <option value="SEPHORA">SEPHORA</option>
-                            <option value="PERFUMARIAS">PERFUMARIAS</option>
-                            <option value="MARKETPLACE">MARKETPLACE</option>
-                            <option value="ECOMMERCE">ECOMMERCE</option>
-                            <option value="ATACADO">ATACADO</option>
-                            <option value="INDIRETO">INDIRETO</option>
-                            <option value="BOUTIQUE">BOUTIQUE</option>
-                            <option value="BELEZA NA WEB">BELEZA NA WEB</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="grid">
-                    <div class="form-group">
-                        <label class="form-label">Contato</label>
-                        <input type="email" id="contatoCliente" class="form-input" placeholder="email@cliente.com">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Telefone</label>
-                        <input type="tel" id="telefoneCliente" class="form-input" placeholder="(11) 9999-9999">
-                    </div>
-                </div>
-
-                <div class="btn-group">
-                    <button class="btn btn-primary" onclick="adicionarCliente()">➕ Adicionar Cliente</button>
-                    <button class="btn btn-secondary" onclick="limparClienteForm()">🔄 Limpar</button>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-title">💰 Orçamento Mensal por Canal</div>
-                <p class="text-muted mb-16">Defina os percentuais por tipo de verba para cada canal - Todos aparecem abaixo para edição</p>
-
+                <div class="card-title">⚙️ Configurar Percentuais por Canal</div>
                 <div class="table-container">
                     <table>
                         <thead>
                             <tr>
                                 <th>Canal</th>
-                                <th>% Bônus</th>
-                                <th>% Coop Off</th>
-                                <th>% Promo</th>
-                                <th>% Total</th>
-                                <th>Ação</th>
+                                <th>Bonus (%)</th>
+                                <th>Coop Off (%)</th>
+                                <th>Promo (%)</th>
+                                <th>Ações</th>
                             </tr>
                         </thead>
-                        <tbody id="tabela-orcamentos"></tbody>
+                        <tbody id="tabela-config-canais"></tbody>
                     </table>
                 </div>
             </div>
 
             <div class="card">
-                <div class="card-title">📊 Importar Faturamento Mensal</div>
-                <p class="text-muted mb-16">Importe o faturamento para cálculo automático de orçamento</p>
-
-                <div class="form-group">
-                    <label class="form-label">Selecione o Mês *</label>
-                    <input type="month" id="mesFaturamento" class="form-input" value="2025-12">
+                <div class="card-title">💰 Faturamento Mensal por Canal</div>
+                
+                <div class="grid">
+                    <div class="form-group">
+                        <label class="form-label">Mês *</label>
+                        <input type="month" id="mesFaturamento" class="form-input" value="2025-12">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Canal *</label>
+                        <select id="canalFaturamento" class="form-select">
+                            <option value="">-- Selecione --</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Arquivo Excel *</label>
-                    <input type="file" id="arquivoFaturamento" class="form-input" accept=".xlsx">
+                    <label class="form-label">Faturamento (R$) *</label>
+                    <input type="number" id="valorFaturamento" class="form-input" placeholder="0,00" step="0.01">
                 </div>
 
-                <div class="btn-group mt-16">
-                    <button class="btn btn-primary" onclick="importarFaturamentoEx
-cel()">📥 Importar Faturamento (Excel)</button>
-                </div>
+                <button class="btn btn-primary" onclick="salvarFaturamento()">💾 Salvar Faturamento</button>
             </div>
 
             <div class="card">
-                <div class="card-title">📝 Definir Orçamento Manual</div>
+                <div class="card-title">📊 Orçamento Manual</div>
                 
                 <div class="grid">
                     <div class="form-group">
@@ -912,6 +839,7 @@ cel()">📥 Importar Faturamento (Excel)</button>
     </div>
 
     <script>
+        // ==================== DADOS GLOBAIS ====================
         let clientes = JSON.parse(localStorage.getItem('clientes')) || [
             { id: 1, nome: 'EPOCA.COM', codigo: 'ECO001', canal: 'ECOMMERCE', contato: 'contato@epoca.com' },
             { id: 2, nome: 'AMAZON', codigo: 'AMZ001', canal: 'MARKETPLACE', contato: 'seller@amazon.com' },
@@ -935,6 +863,58 @@ cel()">📥 Importar Faturamento (Excel)</button>
 
         let faturamentoMensal = JSON.parse(localStorage.getItem('faturamentoMensal')) || {};
 
+        // ==================== FUNÇÕES UTILITÁRIAS ====================
+        
+        /**
+         * Formata um número como moeda brasileira (R$)
+         */
+        function formatarMoeda(valor) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(valor);
+        }
+
+        /**
+         * Cria um elemento de alerta de forma segura (sem XSS)
+         */
+        function criarAlerta(tipo, mensagem) {
+            const alerta = document.createElement('div');
+            alerta.className = `alert alert-${tipo}`;
+            alerta.textContent = mensagem;
+            return alerta;
+        }
+
+        /**
+         * Cria uma célula de tabela com texto seguro
+         */
+        function criarCelula(conteudo, tag = 'td') {
+            const celula = document.createElement(tag);
+            if (typeof conteudo === 'string') {
+                celula.textContent = conteudo;
+            } else {
+                celula.appendChild(conteudo);
+            }
+            return celula;
+        }
+
+        /**
+         * Cria uma linha de tabela
+         */
+        function criarLinha(...celulas) {
+            const linha = document.createElement('tr');
+            celulas.forEach(celula => {
+                if (typeof celula === 'string') {
+                    linha.appendChild(criarCelula(celula));
+                } else {
+                    linha.appendChild(celula);
+                }
+            });
+            return linha;
+        }
+
+        // ==================== INICIALIZAÇÃO ====================
+
         function inicializarDados() {
             if (localStorage.getItem('lancamentos') === null) {
                 lancamentos = [
@@ -954,11 +934,52 @@ cel()">📥 Importar Faturamento (Excel)</button>
             localStorage.setItem('faturamentoMensal', JSON.stringify(faturamentoMensal));
         }
 
+        function preencherSelectCanais() {
+            const canais = Object.keys(orcamentos);
+            const selects = ['canalLancamento', 'canalFaturamento', 'canalOrcamento'];
+            
+            selects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                if (select) {
+                    const opcoes = select.querySelectorAll('option:not([value=""])');
+                    opcoes.forEach(op => op.remove());
+                    
+                    canais.forEach(canal => {
+                        const option = document.createElement('option');
+                        option.value = canal;
+                        option.textContent = canal;
+                        select.appendChild(option);
+                    });
+                }
+            });
+        }
+
+        function preencherSelectClientes() {
+            const select = document.getElementById('clienteLancamento');
+            if (select) {
+                const opcoes = select.querySelectorAll('option:not([value=""])');
+                opcoes.forEach(op => op.remove());
+                
+                clientes.forEach(cliente => {
+                    const option = document.createElement('option');
+                    option.value = cliente.nome;
+                    option.textContent = `${cliente.nome} (${cliente.canal})`;
+                    select.appendChild(option);
+                });
+            }
+        }
+
+        // ==================== NAVEGAÇÃO ====================
+
         function switchTab(tabName, evt) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             
-            document.getElementById(tabName).classList.add('active');
+            const tabElement = document.getElementById(tabName);
+            if (tabElement) {
+                tabElement.classList.add('active');
+            }
+            
             if (evt && evt.target) {
                 evt.target.classList.add('active');
             }
@@ -968,6 +989,8 @@ cel()">📥 Importar Faturamento (Excel)</button>
             if (tabName === 'configuracoes') carregarConfiguracoes();
             if (tabName === 'relatorios') carregarRelatorios();
         }
+
+        // ==================== DASHBOARD ====================
 
         function atualizarDashboard() {
             const mes = document.getElementById('mesAtual').value || '2025-12';
@@ -1006,26 +1029,17 @@ cel()">📥 Importar Faturamento (Excel)</button>
                 .reduce((sum, l) => sum + parseFloat(l.valor), 0);
 
             if (disponivel < 0) {
-                container.innerHTML += `
-                    <div class="alert alert-error">
-                        ⚠️ <strong>ATENÇÃO!</strong> Você ultrapassou o orçamento em ${formatarMoeda(Math.abs(disponivel))}
-                    </div>
-                `;
+                container.appendChild(criarAlerta('error', 
+                    `⚠️ ATENÇÃO! Você ultrapassou o orçamento em ${formatarMoeda(Math.abs(disponivel))}`));
             } else if (orcamentoTotal > 0 && disponivel < totalInvestidoNum * 0.2) {
-                container.innerHTML += `
-                    <div class="alert alert-warning">
-                        📌 Orçamento com pouca disponibilidade. Cuidado com novos lançamentos.
-                    </div>
-                `;
+                container.appendChild(criarAlerta('warning',
+                    '📌 Orçamento com pouca disponibilidade. Cuidado com novos lançamentos.'));
             }
 
             const clientesAviso = verificarClientesAcimaBudget(mes);
             if (clientesAviso.length > 0) {
-                container.innerHTML += `
-                    <div class="alert alert-warning">
-                        ⚠️ ${clientesAviso.length} cliente(s) ultrapassaram o orçamento: ${clientesAviso.join(', ')}
-                    </div>
-                `;
+                container.appendChild(criarAlerta('warning',
+                    `⚠️ ${clientesAviso.length} cliente(s) ultrapassaram o orçamento: ${clientesAviso.join(', ')}`));
             }
 
             document.getElementById('clientesAviso').textContent = clientesAviso.length;
@@ -1041,6 +1055,29 @@ cel()">📥 Importar Faturamento (Excel)</button>
                 }
             });
             return clientesAviso;
+        }
+
+        function calcularOrcamentoCliente(clienteId, mes) {
+            const cliente = clientes.find(c => c.id === clienteId);
+            if (!cliente) return 0;
+            
+            const faturamentoChave = `${mes}-${cliente.canal}`;
+            const faturamento = parseFloat(faturamentoMensal[faturamentoChave] || 0);
+            const orcCanal = orcamentos[cliente.canal];
+            
+            if (!orcCanal) return 0;
+            
+            const percentualTotal = orcCanal.bonus + orcCanal.coopOff + orcCanal.promo;
+            return faturamento * (percentualTotal / 100);
+        }
+
+        function calcularInvestidoCliente(clienteId, mes) {
+            const cliente = clientes.find(c => c.id === clienteId);
+            if (!cliente) return 0;
+            
+            return lancamentos
+                .filter(l => l.cliente === cliente.nome && l.mes === mes)
+                .reduce((sum, l) => sum + parseFloat(l.valor), 0);
         }
 
         function atualizarTabelaCanais(mes) {
@@ -1062,3 +1099,414 @@ cel()">📥 Importar Faturamento (Excel)</button>
                 const percentualUtilizado = orcamento > 0 ? ((investido / orcamento) * 100).toFixed(1) : 0;
 
                 let statusTexto = percentualUtilizado > 100 ? '❌ Acima' :
+                                  percentualUtilizado > 80 ? '⚠️ Crítico' :
+                                  percentualUtilizado > 50 ? '📊 Moderado' : '✅ Baixo';
+
+                tabela.appendChild(criarLinha(
+                    canal,
+                    formatarMoeda(orcamento),
+                    formatarMoeda(investido),
+                    formatarMoeda(disponivel),
+                    percentualUtilizado + '%',
+                    statusTexto
+                ));
+            });
+        }
+
+        function atualizarTopClientes(mes) {
+            const tabela = document.getElementById('tabela-top-clientes');
+            tabela.innerHTML = '';
+
+            const clientesData = clientes.map(cliente => {
+                const investido = calcularInvestidoCliente(cliente.id, mes);
+                const orcamento = calcularOrcamentoCliente(cliente.id, mes);
+                const percentual = orcamento > 0 ? ((investido / orcamento) * 100).toFixed(1) : 0;
+                
+                return { cliente, investido, orcamento, percentual };
+            }).filter(c => c.investido > 0)
+              .sort((a, b) => b.investido - a.investido)
+              .slice(0, 10);
+
+            clientesData.forEach(item => {
+                tabela.appendChild(criarLinha(
+                    item.cliente.nome,
+                    item.cliente.canal,
+                    formatarMoeda(item.investido),
+                    formatarMoeda(item.orcamento),
+                    item.percentual + '%'
+                ));
+            });
+        }
+
+        function atualizarVisaoMensal() {
+            const ano = document.getElementById('anoVisaoMensal').value || '2025';
+            const tabela = document.getElementById('tabela-visao-mensal');
+            tabela.innerHTML = '';
+
+            const meses = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+            const nomeMeses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                              'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+
+            let totalAnoProvisao = 0, totalAnoND = 0, totalAnoPago = 0, totalAnoGeral = 0;
+
+            meses.forEach((mes, idx) => {
+                const mesFull = `${ano}-${mes}`;
+                const lancamentosMes = lancamentos.filter(l => l.mes === mesFull);
+                
+                const provisao = lancamentosMes.filter(l => l.status === 'Provisão').reduce((s, l) => s + parseFloat(l.valor), 0);
+                const nd = lancamentosMes.filter(l => l.status === 'ND Negociada').reduce((s, l) => s + parseFloat(l.valor), 0);
+                const pago = lancamentosMes.filter(l => l.status === 'Pago').reduce((s, l) => s + parseFloat(l.valor), 0);
+                const total = provisao + nd + pago;
+
+                totalAnoProvisao += provisao;
+                totalAnoND += nd;
+                totalAnoPago += pago;
+                totalAnoGeral += total;
+
+                const percentualAno = totalAnoGeral > 0 ? ((total / totalAnoGeral) * 100).toFixed(1) : 0;
+
+                tabela.appendChild(criarLinha(
+                    nomeMeses[idx],
+                    formatarMoeda(provisao),
+                    formatarMoeda(nd),
+                    formatarMoeda(pago),
+                    formatarMoeda(total),
+                    percentualAno + '%'
+                ));
+            });
+
+            document.getElementById('total-ano-provisao').textContent = formatarMoeda(totalAnoProvisao);
+            document.getElementById('total-ano-nd').textContent = formatarMoeda(totalAnoND);
+            document.getElementById('total-ano-pago').textContent = formatarMoeda(totalAnoPago);
+            document.getElementById('total-ano-geral').textContent = formatarMoeda(totalAnoGeral);
+        }
+
+        // ==================== LANÇAMENTOS ====================
+
+        function carregarLancamentos() {
+            preencherSelectClientes();
+            preencherSelectCanais();
+            atualizarTabelaLancamentos();
+        }
+
+        function selecionarCliente() {
+            const clienteNome = document.getElementById('clienteLancamento').value;
+            const cliente = clientes.find(c => c.nome === clienteNome);
+            
+            if (cliente) {
+                const selectCanal = document.getElementById('canalLancamento');
+                selectCanal.value = cliente.canal;
+            }
+        }
+
+        function salvarLancamento() {
+            const cliente = document.getElementById('clienteLancamento').value;
+            const tipo = document.getElementById('tipoLancamento').value;
+            const canal = document.getElementById('canalLancamento').value;
+            const descricao = document.getElementById('descricaoLancamento').value;
+            const valor = parseFloat(document.getElementById('valorLancamento').value);
+            const mes = document.getElementById('mesLancamento').value;
+            const status = document.getElementById('statusLancamento').value;
+            const dataPagamento = document.getElementById('dataPagamentoLancamento').value;
+            const obs = document.getElementById('obsLancamento').value;
+
+            if (!cliente || !tipo || !canal || !descricao || !valor || !mes) {
+                alert('Por favor, preencha todos os campos obrigatórios (*)');
+                return;
+            }
+
+            proximoId++;
+            const novoLancamento = {
+                id: `VB${proximoId}-${mes}`,
+                cliente,
+                canal,
+                tipo,
+                descricao,
+                valor,
+                mes,
+                mesTrabalho: mes,
+                dataPrevisaoPagamento: dataPagamento,
+                status,
+                obs,
+                responsavel: 'USUARIO'
+            };
+
+            lancamentos.push(novoLancamento);
+            salvarDados();
+
+            document.getElementById('clienteLancamento').value = '';
+            document.getElementById('tipoLancamento').value = '';
+            document.getElementById('canalLancamento').value = '';
+            document.getElementById('descricaoLancamento').value = '';
+            document.getElementById('valorLancamento').value = '';
+            document.getElementById('mesLancamento').value = '2025-12';
+            document.getElementById('statusLancamento').value = 'Provisão';
+            document.getElementById('dataPagamentoLancamento').value = '';
+            document.getElementById('obsLancamento').value = '';
+
+            alert('Lançamento salvo com sucesso!');
+            atualizarTabelaLancamentos();
+            atualizarDashboard();
+        }
+
+        function atualizarTabelaLancamentos() {
+            const tabela = document.getElementById('tabela-lancamentos');
+            tabela.innerHTML = '';
+
+            lancamentos.forEach((lancamento, idx) => {
+                const linha = document.createElement('tr');
+                
+                linha.appendChild(criarCelula(lancamento.id));
+                linha.appendChild(criarCelula(lancamento.cliente));
+                linha.appendChild(criarCelula(lancamento.tipo));
+                linha.appendChild(criarCelula(formatarMoeda(lancamento.valor)));
+                linha.appendChild(criarCelula(lancamento.mes));
+                
+                const statusCell = criarCelula('');
+                const badge = document.createElement('span');
+                badge.className = `status-badge status-${lancamento.status.toLowerCase().replace(' ', '')}`;
+                badge.textContent = lancamento.status;
+                statusCell.appendChild(badge);
+                linha.appendChild(statusCell);
+                
+                const acoes = criarCelula('');
+                const btnEditar = document.createElement('button');
+                btnEditar.className = 'btn btn-secondary btn-small';
+                btnEditar.textContent = '✏️ Editar';
+                btnEditar.onclick = () => editarLancamento(idx);
+                
+                const btnDeletar = document.createElement('button');
+                btnDeletar.className = 'btn btn-danger btn-small';
+                btnDeletar.textContent = '🗑️ Deletar';
+                btnDeletar.onclick = () => deletarLancamento(idx);
+                
+                acoes.appendChild(btnEditar);
+                acoes.appendChild(document.createTextNode(' '));
+                acoes.appendChild(btnDeletar);
+                linha.appendChild(acoes);
+                
+                tabela.appendChild(linha);
+            });
+        }
+
+        function editarLancamento(idx) {
+            alert('Funcionalidade de edição em desenvolvimento');
+        }
+
+        function deletarLancamento(idx) {
+            if (confirm('Tem certeza que deseja deletar este lançamento?')) {
+                lancamentos.splice(idx, 1);
+                salvarDados();
+                atualizarTabelaLancamentos();
+                atualizarDashboard();
+            }
+        }
+
+        // ==================== CONFIGURAÇÕES ====================
+
+        function carregarConfiguracoes() {
+            atualizarTabelaConfigCanais();
+            preencherSelectCanais();
+            atualizarTabelaClientes();
+        }
+
+        function atualizarTabelaConfigCanais() {
+            const tabela = document.getElementById('tabela-config-canais');
+            tabela.innerHTML = '';
+
+            Object.entries(orcamentos).forEach(([canal, valores]) => {
+                const linha = document.createElement('tr');
+                
+                linha.appendChild(criarCelula(canal));
+                linha.appendChild(criarCelula(valores.bonus.toFixed(2)));
+                linha.appendChild(criarCelula(valores.coopOff.toFixed(2)));
+                linha.appendChild(criarCelula(valores.promo.toFixed(2)));
+                
+                const acoes = criarCelula('');
+                const btn = document.createElement('button');
+                btn.className = 'btn btn-secondary btn-small';
+                btn.textContent = '✏️ Editar';
+                btn.onclick = () => alert('Edição de percentuais em desenvolvimento');
+                acoes.appendChild(btn);
+                linha.appendChild(acoes);
+                
+                tabela.appendChild(linha);
+            });
+        }
+
+        function salvarFaturamento() {
+            const mes = document.getElementById('mesFaturamento').value;
+            const canal = document.getElementById('canalFaturamento').value;
+            const valor = parseFloat(document.getElementById('valorFaturamento').value);
+
+            if (!mes || !canal || !valor) {
+                alert('Por favor, preencha todos os campos');
+                return;
+            }
+
+            const chave = `${mes}-${canal}`;
+            faturamentoMensal[chave] = valor;
+            salvarDados();
+
+            alert('Faturamento salvo com sucesso!');
+            document.getElementById('valorFaturamento').value = '';
+            atualizarDashboard();
+        }
+
+        function salvarOrcamentoManual() {
+            const mes = document.getElementById('mesOrcamento').value;
+            const canal = document.getElementById('canalOrcamento').value;
+            const valor = parseFloat(document.getElementById('valorOrcamento').value);
+
+            if (!mes || !canal || !valor) {
+                alert('Por favor, preencha todos os campos');
+                return;
+            }
+
+            const chave = `${mes}-${canal}`;
+            faturamentoMensal[chave] = valor;
+            salvarDados();
+
+            alert('Orçamento salvo com sucesso!');
+            document.getElementById('valorOrcamento').value = '';
+            atualizarDashboard();
+        }
+
+        function atualizarTabelaClientes() {
+            const tabela = document.getElementById('tabela-clientes');
+            tabela.innerHTML = '';
+
+            clientes.forEach((cliente, idx) => {
+                const linha = document.createElement('tr');
+                
+                linha.appendChild(criarCelula(cliente.nome));
+                linha.appendChild(criarCelula(cliente.codigo));
+                linha.appendChild(criarCelula(cliente.canal));
+                linha.appendChild(criarCelula(cliente.contato));
+                
+                const acoes = criarCelula('');
+                const btn = document.createElement('button');
+                btn.className = 'btn btn-danger btn-small';
+                btn.textContent = '🗑️ Deletar';
+                btn.onclick = () => {
+                    if (confirm('Tem certeza que deseja deletar este cliente?')) {
+                        clientes.splice(idx, 1);
+                        salvarDados();
+                        atualizarTabelaClientes();
+                    }
+                };
+                acoes.appendChild(btn);
+                linha.appendChild(acoes);
+                
+                tabela.appendChild(linha);
+            });
+        }
+
+        // ==================== RELATÓRIOS ====================
+
+        function carregarRelatorios() {
+            gerarRelatorioCanal();
+            gerarRelatorioIndicadores();
+        }
+
+        function gerarRelatorioCanal() {
+            const dataInicio = document.getElementById('relatorioDataInicio').value;
+            const dataFim = document.getElementById('relatorioDataFim').value;
+            const tabela = document.getElementById('relatorio-canal');
+            tabela.innerHTML = '';
+
+            Object.keys(orcamentos).forEach(canal => {
+                const lancamentosCanal = lancamentos.filter(l => 
+                    l.canal === canal && l.mes >= dataInicio && l.mes <= dataFim
+                );
+
+                const provisao = lancamentosCanal.filter(l => l.status === 'Provisão').reduce((s, l) => s + parseFloat(l.valor), 0);
+                const nd = lancamentosCanal.filter(l => l.status === 'ND Negociada').reduce((s, l) => s + parseFloat(l.valor), 0);
+                const pago = lancamentosCanal.filter(l => l.status === 'Pago').reduce((s, l) => s + parseFloat(l.valor), 0);
+                const total = provisao + nd + pago;
+
+                if (total > 0) {
+                    tabela.appendChild(criarLinha(
+                        canal,
+                        formatarMoeda(provisao),
+                        formatarMoeda(nd),
+                        formatarMoeda(pago),
+                        formatarMoeda(total)
+                    ));
+                }
+            });
+        }
+
+        function gerarRelatorioIndicadores() {
+            const tabela = document.getElementById('relatorio-cliente');
+            tabela.innerHTML = '';
+
+            clientes.forEach(cliente => {
+                const totalInvestido = lancamentos
+                    .filter(l => l.cliente === cliente.nome)
+                    .reduce((s, l) => s + parseFloat(l.valor), 0);
+
+                if (totalInvestido === 0) return;
+
+                const orcamento = calcularOrcamentoCliente(cliente.id, '2025-12');
+                const percentualUtilizacao = orcamento > 0 ? ((totalInvestido / orcamento) * 100).toFixed(1) : 0;
+                const roi = orcamento > 0 ? (((totalInvestido / orcamento) - 1) * 100).toFixed(1) : 0;
+                const lancamentosCliente = lancamentos.filter(l => l.cliente === cliente.nome);
+                const ticketMedio = lancamentosCliente.length > 0 ? (totalInvestido / lancamentosCliente.length).toFixed(2) : 0;
+                
+                const status = percentualUtilizacao > 100 ? '❌ Acima' : '✅ OK';
+                const tendencia = lancamentosCliente.length > 0 ? '📈 Crescente' : '📉 Estável';
+
+                tabela.appendChild(criarLinha(
+                    cliente.nome,
+                    cliente.canal,
+                    formatarMoeda(totalInvestido),
+                    formatarMoeda(orcamento),
+                    percentualUtilizacao + '%',
+                    roi + '%',
+                    formatarMoeda(ticketMedio),
+                    lancamentosCliente.length,
+                    status,
+                    tendencia
+                ));
+            });
+        }
+
+        function exportarRelatorioCSV() {
+            let csv = 'Cliente,Canal,Total Investido,Orçamento,% Utilização,ROI,Ticket Médio,Lançamentos\n';
+
+            clientes.forEach(cliente => {
+                const totalInvestido = lancamentos
+                    .filter(l => l.cliente === cliente.nome)
+                    .reduce((s, l) => s + parseFloat(l.valor), 0);
+
+                if (totalInvestido === 0) return;
+
+                const orcamento = calcularOrcamentoCliente(cliente.id, '2025-12');
+                const percentualUtilizacao = orcamento > 0 ? ((totalInvestido / orcamento) * 100).toFixed(1) : 0;
+                const roi = orcamento > 0 ? (((totalInvestido / orcamento) - 1) * 100).toFixed(1) : 0;
+                const lancamentosCliente = lancamentos.filter(l => l.cliente === cliente.nome);
+                const ticketMedio = lancamentosCliente.length > 0 ? (totalInvestido / lancamentosCliente.length).toFixed(2) : 0;
+
+                csv += `"${cliente.nome}","${cliente.canal}",${totalInvestido},${orcamento},${percentualUtilizacao},${roi},${ticketMedio},${lancamentosCliente.length}\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'relatorio_investimentos.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        // ==================== INICIALIZAÇÃO DA PÁGINA ====================
+        window.addEventListener('load', () => {
+            inicializarDados();
+            preencherSelectClientes();
+            preencherSelectCanais();
+            atualizarDashboard();
+        });
+    </script>
+</body>
+</html>
