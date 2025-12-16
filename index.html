@@ -258,7 +258,7 @@
             color: #1e40af;
         }
 
-        .status-nd, .status-ndnegociada {
+        .status-ndnegociada {
             background-color: rgba(34, 197, 94, 0.1);
             color: #166534;
         }
@@ -266,6 +266,11 @@
         .status-pago {
             background-color: rgba(34, 197, 94, 0.2);
             color: #15803d;
+        }
+
+        .status-aberto {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: #92400e;
         }
 
         .stat-box {
@@ -325,6 +330,56 @@
             background-color: rgba(59, 130, 246, 0.1);
             color: #1e40af;
             border-left: 4px solid var(--color-info);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: var(--color-surface);
+            border-radius: 8px;
+            padding: var(--space-24);
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: var(--space-16);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--color-text-secondary);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: var(--space-24);
         }
 
         @media (max-width: 768px) {
@@ -416,7 +471,7 @@
             <button class="tab-btn" onclick="switchTab('configuracoes', event)">⚙️ Configurações</button>
             <button class="tab-btn" onclick="switchTab('relatorios', event)">📋 Relatórios</button>
         </div>
-
+        <!-- DASHBOARD TAB -->
         <div id="dashboard" class="tab-content active">
             <div class="card">
                 <div class="card-title">📈 Resumo Mensal - Dezembro 2025</div>
@@ -426,7 +481,7 @@
                     <input type="month" id="mesAtual" class="form-input" value="2025-12" onchange="atualizarDashboard()">
                 </div>
 
-                <div class="grid grid-lg">
+                <div class="grid-lg">
                     <div class="stat-box">
                         <div class="stat-label">Total Investido</div>
                         <div class="stat-value" id="totalInvestido">R$ 0,00</div>
@@ -447,4 +502,563 @@
                         <div class="stat-value" id="clientesAviso">0</div>
                         <div class="stat-unit">requerem atenção</div>
                     </div>
-                </div
+                </div>
+            </div>
+
+            <div id="alertas-container"></div>
+
+            <div class="card">
+                <div class="card-title">🎯 Desempenho por Canal</div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Canal</th>
+                                <th>Orçamento Mensal</th>
+                                <th>Investido</th>
+                                <th>Disponível</th>
+                                <th>% Utilizado</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-canais"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">⭐ Top 10 Clientes por Investimento</div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Canal</th>
+                                <th>Investimentos</th>
+                                <th>Orçamento</th>
+                                <th>% Consumido</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-top-clientes"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📅 Investimentos por Mês - Ano Completo</div>
+                
+                <div class="form-group mb-16">
+                    <label class="form-label">Ano:</label>
+                    <select id="anoVisaoMensal" class="form-select" style="max-width: 200px;" onchange="atualizarVisaoMensal()">
+                        <option value="2023">2023</option>
+                        <option value="2024">2024</option>
+                        <option value="2025" selected>2025</option>
+                    </select>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Mês</th>
+                                <th>📌 Provisão</th>
+                                <th>✅ ND Negociada</th>
+                                <th>💳 Pago</th>
+                                <th>💰 Total</th>
+                                <th>📊 % do Ano</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-visao-mensal"></tbody>
+                        <tfoot>
+                            <tr style="font-weight: bold; background-color: #f3f4f6;">
+                                <td>TOTAL ANO</td>
+                                <td id="total-ano-provisao">R$ 0,00</td>
+                                <td id="total-ano-nd">R$ 0,00</td>
+                                <td id="total-ano-pago">R$ 0,00</td>
+                                <td id="total-ano-geral">R$ 0,00</td>
+                                <td>100%</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- LANÇAMENTOS TAB -->
+        <div id="lancamentos" class="tab-content">
+            <div class="card">
+                <div class="card-title">➕ Novo Lançamento de Investimento</div>
+                
+                <div class="form-group">
+                    <label class="form-label">Cliente *</label>
+                    <select id="clienteLancamento" class="form-select" onchange="selecionarCliente()">
+                        <option value="">-- Selecione um cliente --</option>
+                    </select>
+                </div>
+
+                <div class="grid">
+                    <div class="form-group">
+                        <label class="form-label">Canal *</label>
+                        <input type="text" id="canalLancamento" class="form-input" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Verba *</label>
+                        <select id="tipoVerba" class="form-select">
+                            <option value="">-- Selecione --</option>
+                            <option value="COOP OFF">Coop Off</option>
+                            <option value="REBATE">Rebate</option>
+                            <option value="BONUS">Bonus por Meta</option>
+                            <option value="VPC">VPC</option>
+                            <option value="INVESTIMENTOS">Investimentos</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="form-group">
+                        <label class="form-label">Descrição *</label>
+                        <input type="text" id="descricaoLancamento" class="form-input" placeholder="Ex: Promoção de Verão">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Valor (R$) *</label>
+                        <input type="number" id="valorLancamento" class="form-input" placeholder="0,00" step="0.01">
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="form-group">
+                        <label class="form-label">Mês de Referência *</label>
+                        <input type="month" id="mesLancamento" class="form-input" value="2025-12">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Mês de Competência (Despesa) *</label>
+                        <input type="month" id="mesTrabalho" class="form-input" value="2025-12">
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="form-group">
+                        <label class="form-label">Status *</label>
+                        <select id="statusLancamento" class="form-select">
+                            <option value="Provisão">📌 Provisão (expectativa de gasto)</option>
+                            <option value="ND Negociada">✅ ND Negociada (oficializada)</option>
+                            <option value="Pago">💳 Pago</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Data Prevista de Pagamento *</label>
+                        <input type="date" id="dataPrevisaoPagamento" class="form-input" value="">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Observações</label>
+                    <textarea id="obsLancamento" class="form-textarea" rows="3" placeholder="Detalhes adicionais..."></textarea>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="adicionarLancamento()">✅ Lançar Investimento</button>
+                    <button class="btn btn-secondary" onclick="limparFormulario()">🔄 Limpar</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📝 Histórico de Lançamentos</div>
+                
+                <div class="grid">
+                    <div class="form-group">
+                        <label class="form-label">Filtrar por Cliente:</label>
+                        <input type="text" id="filtroCliente" class="form-input" placeholder="Procure um cliente..." onkeyup="filtrarLancamentos()">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Filtrar por Status:</label>
+                        <select id="filtroStatus" class="form-select" onchange="filtrarLancamentos()">
+                            <option value="">-- Todos --</option>
+                            <option value="Provisão">Provisão</option>
+                            <option value="ND Negociada">ND Negociada</option>
+                            <option value="Pago">Pago</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-container mt-16">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Canal</th>
+                                <th>Verba</th>
+                                <th>Descrição</th>
+                                <th>Valor</th>
+                                <th>Mês Ref.</th>
+                                <th>Mês Competência</th>
+                                <th>Prev. Pagto</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-lancamentos"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONFIGURAÇÕES TAB -->
+        <div id="configuracoes" class="tab-content">
+            <div class="card">
+                <div class="card-title">📋 Cadastro de Clientes</div>
+                
+                <div class="form-group">
+                    <label class="form-label">Nome do Cliente *</label>
+                    <input type="text" id="nomeCliente" class="form-input">
+                </div>
+
+                <div class="grid">
+                    <div class="form-group">
+                        <label class="form-label">Código *</label>
+                        <input type="text" id="codigoCliente" class="form-input" placeholder="EX: CLI001">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Canal *</label>
+                        <select id="canalCliente" class="form-select">
+                            <option value="">-- Selecione --</option>
+                            <option value="SEPHORA">SEPHORA</option>
+                            <option value="PERFUMARIAS">PERFUMARIAS</option>
+                            <option value="MARKETPLACE">MARKETPLACE</option>
+                            <option value="ECOMMERCE">ECOMMERCE</option>
+                            <option value="ATACADO">ATACADO</option>
+                            <option value="INDIRETO">INDIRETO</option>
+                            <option value="BOUTIQUE">BOUTIQUE</option>
+                            <option value="BELEZA NA WEB">BELEZA NA WEB</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="form-group">
+                        <label class="form-label">Contato</label>
+                        <input type="email" id="contatoCliente" class="form-input" placeholder="email@cliente.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Telefone</label>
+                        <input type="tel" id="telefoneCliente" class="form-input" placeholder="(11) 9999-9999">
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="adicionarCliente()">➕ Adicionar Cliente</button>
+                    <button class="btn btn-secondary" onclick="limparClienteForm()">🔄 Limpar</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">💰 Orçamento Mensal por Canal</div>
+                <p class="text-muted mb-16">Defina os percentuais por tipo de verba para cada canal - Todos aparecem abaixo para edição</p>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Canal</th>
+                                <th>% Bônus</th>
+                                <th>% Coop Off</th>
+                                <th>% Promo</th>
+                                <th>% Total</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-orcamentos"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📊 Importar Faturamento Mensal</div>
+                <p class="text-muted mb-16">Importe o faturamento para cálculo automático de orçamento</p>
+
+                <div class="form-group">
+                    <label class="form-label">Selecione o Mês *</label>
+                    <input type="month" id="mesFaturamento" class="form-input" value="2025-12">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Arquivo Excel *</label>
+                    <input type="file" id="arquivoFaturamento" class="form-input" accept=".xlsx">
+                </div>
+
+                <div class="btn-group mt-16">
+                    <button class="btn btn-primary" onclick="importarFaturamentoEx
+cel()">📥 Importar Faturamento (Excel)</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📝 Definir Orçamento Manual</div>
+                
+                <div class="grid">
+                    <div class="form-group">
+                        <label class="form-label">Mês *</label>
+                        <input type="month" id="mesOrcamento" class="form-input" value="2025-12">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Canal *</label>
+                        <select id="canalOrcamento" class="form-select">
+                            <option value="">-- Selecione --</option>
+                            <option value="SEPHORA">SEPHORA</option>
+                            <option value="PERFUMARIAS">PERFUMARIAS</option>
+                            <option value="MARKETPLACE">MARKETPLACE</option>
+                            <option value="ECOMMERCE">ECOMMERCE</option>
+                            <option value="ATACADO">ATACADO</option>
+                            <option value="INDIRETO">INDIRETO</option>
+                            <option value="BOUTIQUE">BOUTIQUE</option>
+                            <option value="BELEZA NA WEB">BELEZA NA WEB</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Orçamento (R$) *</label>
+                    <input type="number" id="valorOrcamento" class="form-input" placeholder="0,00" step="0.01">
+                </div>
+
+                <button class="btn btn-primary" onclick="salvarOrcamentoManual()">💾 Salvar Orçamento</button>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📋 Clientes Cadastrados</div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Código</th>
+                                <th>Canal</th>
+                                <th>Contato</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-clientes"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- RELATÓRIOS TAB -->
+        <div id="relatorios" class="tab-content">
+            <div class="card">
+                <div class="card-title">📊 Relatório Consolidado por Canal</div>
+                
+                <div class="form-group mb-16">
+                    <label class="form-label">Período:</label>
+                    <div class="grid">
+                        <div>
+                            <label class="form-label" style="font-size: 12px; margin-bottom: 4px;">De:</label>
+                            <input type="month" id="relatorioDataInicio" class="form-input" value="2025-01">
+                        </div>
+                        <div>
+                            <label class="form-label" style="font-size: 12px; margin-bottom: 4px;">Até:</label>
+                            <input type="month" id="relatorioDataFim" class="form-input" value="2025-12">
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary mb-16" onclick="gerarRelatorioCanal()">📊 Gerar Relatório</button>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Canal</th>
+                                <th>Provisões</th>
+                                <th>ND Negociadas</th>
+                                <th>Pago</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="relatorio-canal"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📊 Indicadores de Investimento por Cliente</div>
+                <p class="text-muted mb-16">Análise de performance e KPIs de investimento por cliente</p>
+
+                <button class="btn btn-primary mb-16" onclick="gerarRelatorioIndicadores()">🔄 Atualizar Relatório</button>
+                <button class="btn btn-secondary mb-16" onclick="exportarRelatorioCSV()">📥 Exportar CSV</button>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Canal</th>
+                                <th>💰 Total Investido</th>
+                                <th>📊 Orçamento</th>
+                                <th>% Utilização</th>
+                                <th>📈 ROI (%)</th>
+                                <th>💵 Ticket Médio</th>
+                                <th>📝 Lançamentos</th>
+                                <th>🎯 Status</th>
+                                <th>📈 Tendência</th>
+                            </tr>
+                        </thead>
+                        <tbody id="relatorio-cliente"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let clientes = JSON.parse(localStorage.getItem('clientes')) || [
+            { id: 1, nome: 'EPOCA.COM', codigo: 'ECO001', canal: 'ECOMMERCE', contato: 'contato@epoca.com' },
+            { id: 2, nome: 'AMAZON', codigo: 'AMZ001', canal: 'MARKETPLACE', contato: 'seller@amazon.com' },
+            { id: 3, nome: 'BELEZA NA WEB', codigo: 'BNW001', canal: 'BELEZA NA WEB', contato: 'vendas@belezanaweb.com' },
+            { id: 4, nome: 'AMOBELEZA', codigo: 'AMO001', canal: 'ECOMMERCE', contato: 'contato@amobeleza.com' }
+        ];
+
+        let lancamentos = JSON.parse(localStorage.getItem('lancamentos')) || [];
+        let proximoId = parseInt(localStorage.getItem('proximoId')) || 1000;
+
+        let orcamentos = JSON.parse(localStorage.getItem('orcamentos')) || {
+            'SEPHORA': { bonus: 1.5, coopOff: 2.0, promo: 1.5 },
+            'PERFUMARIAS': { bonus: 1.2, coopOff: 1.5, promo: 0.8 },
+            'MARKETPLACE': { bonus: 1.5, coopOff: 1.8, promo: 0.7 },
+            'ECOMMERCE': { bonus: 1.8, coopOff: 2.0, promo: 0.7 },
+            'ATACADO': { bonus: 0.8, coopOff: 1.2, promo: 0.5 },
+            'INDIRETO': { bonus: 0.7, coopOff: 1.0, promo: 0.3 },
+            'BOUTIQUE': { bonus: 1.0, coopOff: 1.5, promo: 0.5 },
+            'BELEZA NA WEB': { bonus: 1.3, coopOff: 1.8, promo: 0.7 }
+        };
+
+        let faturamentoMensal = JSON.parse(localStorage.getItem('faturamentoMensal')) || {};
+
+        function inicializarDados() {
+            if (localStorage.getItem('lancamentos') === null) {
+                lancamentos = [
+                    { id: 'VB001-2025-09', cliente: 'EPOCA.COM', canal: 'ECOMMERCE', tipo: 'COOP OFF', descricao: 'INVESTIMENTO - BONUS', valor: 14791, mes: '2025-09', mesTrabalho: '2025-09', dataPrevisaoPagamento: '2025-10-15', status: 'Provisão', obs: '', responsavel: 'BRENDA' },
+                    { id: 'VB002-2025-10', cliente: 'AMAZON', canal: 'MARKETPLACE', tipo: 'COOP OFF', descricao: 'INVESTIMENTOS', valor: 153000, mes: '2025-09', mesTrabalho: '2025-09', dataPrevisaoPagamento: '2025-11-01', status: 'Provisão', obs: '', responsavel: 'BRENDA' },
+                    { id: 'VB003-2025-10', cliente: 'BELEZA NA WEB', canal: 'BELEZA NA WEB', tipo: 'COOP OFF', descricao: 'PROJEÇÃO', valor: 3000, mes: '2025-09', mesTrabalho: '2025-09', dataPrevisaoPagamento: '2025-10-20', status: 'Provisão', obs: '', responsavel: 'BRENDA' },
+                ];
+                salvarDados();
+            }
+        }
+
+        function salvarDados() {
+            localStorage.setItem('clientes', JSON.stringify(clientes));
+            localStorage.setItem('lancamentos', JSON.stringify(lancamentos));
+            localStorage.setItem('proximoId', proximoId.toString());
+            localStorage.setItem('orcamentos', JSON.stringify(orcamentos));
+            localStorage.setItem('faturamentoMensal', JSON.stringify(faturamentoMensal));
+        }
+
+        function switchTab(tabName, evt) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            if (evt && evt.target) {
+                evt.target.classList.add('active');
+            }
+
+            if (tabName === 'dashboard') atualizarDashboard();
+            if (tabName === 'lancamentos') carregarLancamentos();
+            if (tabName === 'configuracoes') carregarConfiguracoes();
+            if (tabName === 'relatorios') carregarRelatorios();
+        }
+
+        function atualizarDashboard() {
+            const mes = document.getElementById('mesAtual').value || '2025-12';
+            
+            const lancamentosMes = lancamentos.filter(l => l.mes === mes);
+            const totalInvestido = lancamentosMes.reduce((sum, l) => sum + parseFloat(l.valor), 0);
+
+            let orcamentoTotal = 0;
+            Object.keys(orcamentos).forEach(canal => {
+                const faturamentoChave = `${mes}-${canal}`;
+                const faturamento = parseFloat(faturamentoMensal[faturamentoChave] || 0);
+                const orcCanal = orcamentos[canal];
+                const percentualTotal = orcCanal.bonus + orcCanal.coopOff + orcCanal.promo;
+                orcamentoTotal += faturamento * (percentualTotal / 100);
+            });
+
+            const disponivel = orcamentoTotal - totalInvestido;
+            const taxa = orcamentoTotal > 0 ? ((totalInvestido / orcamentoTotal) * 100).toFixed(1) : 0;
+
+            document.getElementById('totalInvestido').textContent = formatarMoeda(totalInvestido);
+            document.getElementById('orcamentoDisp').textContent = formatarMoeda(disponivel);
+            document.getElementById('taxaUtil').textContent = taxa + '%';
+
+            atualizarAlertas(mes, disponivel, orcamentoTotal);
+            atualizarTabelaCanais(mes);
+            atualizarTopClientes(mes);
+            atualizarVisaoMensal();
+        }
+
+        function atualizarAlertas(mes, disponivel, orcamentoTotal) {
+            const container = document.getElementById('alertas-container');
+            container.innerHTML = '';
+
+            const totalInvestidoNum = lancamentos
+                .filter(l => l.mes === mes)
+                .reduce((sum, l) => sum + parseFloat(l.valor), 0);
+
+            if (disponivel < 0) {
+                container.innerHTML += `
+                    <div class="alert alert-error">
+                        ⚠️ <strong>ATENÇÃO!</strong> Você ultrapassou o orçamento em ${formatarMoeda(Math.abs(disponivel))}
+                    </div>
+                `;
+            } else if (orcamentoTotal > 0 && disponivel < totalInvestidoNum * 0.2) {
+                container.innerHTML += `
+                    <div class="alert alert-warning">
+                        📌 Orçamento com pouca disponibilidade. Cuidado com novos lançamentos.
+                    </div>
+                `;
+            }
+
+            const clientesAviso = verificarClientesAcimaBudget(mes);
+            if (clientesAviso.length > 0) {
+                container.innerHTML += `
+                    <div class="alert alert-warning">
+                        ⚠️ ${clientesAviso.length} cliente(s) ultrapassaram o orçamento: ${clientesAviso.join(', ')}
+                    </div>
+                `;
+            }
+
+            document.getElementById('clientesAviso').textContent = clientesAviso.length;
+        }
+
+        function verificarClientesAcimaBudget(mes) {
+            const clientesAviso = [];
+            clientes.forEach(cliente => {
+                const orcamentoCliente = calcularOrcamentoCliente(cliente.id, mes);
+                const investidoCliente = calcularInvestidoCliente(cliente.id, mes);
+                if (investidoCliente > orcamentoCliente) {
+                    clientesAviso.push(cliente.nome);
+                }
+            });
+            return clientesAviso;
+        }
+
+        function atualizarTabelaCanais(mes) {
+            const tabela = document.getElementById('tabela-canais');
+            tabela.innerHTML = '';
+
+            Object.keys(orcamentos).forEach(canal => {
+                const faturamentoChave = `${mes}-${canal}`;
+                const faturamento = parseFloat(faturamentoMensal[faturamentoChave] || 0);
+                const orcCanal = orcamentos[canal];
+                const percentualTotal = orcCanal.bonus + orcCanal.coopOff + orcCanal.promo;
+                const orcamento = faturamento * (percentualTotal / 100);
+                
+                const investido = lancamentos
+                    .filter(l => l.canal === canal && l.mes === mes)
+                    .reduce((sum, l) => sum + parseFloat(l.valor), 0);
+
+                const disponivel = orcamento - investido;
+                const percentualUtilizado = orcamento > 0 ? ((investido / orcamento) * 100).toFixed(1) : 0;
+
+                let statusTexto = percentualUtilizado > 100 ? '❌ Acima' :
